@@ -50,7 +50,7 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 | --- | --- | --- | --- | --- |
 | 1 | 品牌标识 | 见 git diff | magpie → FreeMagpie（名称/标题/图标，不含二进制 id `magpie` 与路径 `~/.config/magpie`） | 待做 |
 | 2 | 文档 | FREEMAGPIE.md | 本文件 | 已做 |
-| 3 | 官网 | site/ | 独立域名站点（暂不改上游 site/，见「官网」一节） | 待做 |
+| 3 | 官网 | site/ | 独立域名站点（暂不改上游 site/，见「官网」一节） | 已做 |
 
 ## 品牌改动的边界（重要）
 
@@ -77,6 +77,19 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
   （`site/public/`），每次 merge 都要重新构建，维护成本高。
 
 当前选择：A（主仓库保持 site/ 原样）。
+
+**已落地**（[cq0206/freemagpie-site](https://github.com/cq0206/freemagpie-site)，
+本地检出在主仓库旁的 `freemagpie-site/`，已加入 .gitignore）：
+
+- 单页 `index.html`（无构建步骤、无框架、无重图，~14 KB），GitHub Pages
+  从 `main` 分支根目录发布，CNAME 指向 freemagpie.com，已强制开启跳转
+- logo 复用上游 `site/public/img/magpie-small.svg`（MIT），加
+  `fill="currentColor"` 适配深浅色
+- 用户侧还需一步：**到域名注册商给 freemagpie.com 添加 DNS 记录**
+  （以仓库 Settings → Pages 显示为准）：
+  `@` A 记录 → `185.199.108.153` / `185.199.109.153` / `185.199.110.153` /
+  `185.199.111.153`；`www` CNAME → `cq0206.github.io`。
+  DNS 生效、证书签发后再到 Settings → Pages 勾选 Enforce HTTPS。
 
 ## 构建
 

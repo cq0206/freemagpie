@@ -11,3 +11,5 @@
 # freemagpie: local Go caches kept inside the checkout (sandbox builds)
 .gocache/
 .gomodcache/
+# freemagpie: the site repo checked out beside this one (freemagpie-site.git)
+/freemagpie-site/
