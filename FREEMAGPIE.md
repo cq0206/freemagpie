@@ -19,7 +19,9 @@
 - `upstream` → `https://github.com/yetone/magpie.git`
   - 第二个 fetch URL：`https://ghfast.top/https://github.com/yetone/magpie.git`
     （直连 GitHub 不通时的镜像，git 会依次尝试两个 URL）
-- `origin` → 本仓库在 GitHub 的地址（建好后设置：`git remote add origin <url>`）
+  - push 已禁用（`no-push-only-fetch`）：上游是只读的，防误推
+- `origin` → `git@github.com:cq0206/freemagpie.git`（SSH，22 端口可用）
+  - `main` 和 `freemagpie` 都已推送到 origin；上游的 tag 未推（跟踪用本地即可）
 
 ## 同步上游（每次开始工作前）
 
