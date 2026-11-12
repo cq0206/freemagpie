@@ -8,3 +8,6 @@
 /magpie-dev.new
 /internal/update/launcher-*.com
 /internal/gui/assets.zip
+# freemagpie: local Go caches kept inside the checkout (sandbox builds)
+.gocache/
+.gomodcache/
