@@ -45,10 +45,16 @@ const (
 	// serves it (up to four), taken in turn over all their keys and
 	// accounts (Rotate).
 	TemplateEven = "even"
+	// freemagpie: TemplateFree is the free ones first: every provider
+	// the user has free (Provider.CountFree or a model of theirs that is,
+	// FreeModel), strongest first, with the free quota that runs out
+	// soonest spent first (FreeExpiring; docs/freemagpie/ARCHITECTURE.md
+	// §1.4). Made of what is free, it has no need the others have.
+	TemplateFree = "free"
 )
 
 // TemplateKinds are the templates, in the order they are offered.
-var TemplateKinds = []string{TemplateSmart, TemplateThrifty, TemplateSteady, TemplatePlan, TemplateFast, TemplateEven}
+var TemplateKinds = []string{TemplateSmart, TemplateThrifty, TemplateSteady, TemplatePlan, TemplateFast, TemplateEven, TemplateFree}
 
 // The intents TemplateSmart's classifier chooses between. Hard comes
 // first, so a turn the classifier can't place stays on the strong model,
@@ -79,6 +85,9 @@ const (
 	// NeedPlan: no provider is billed by a plan, so "plan first" has
 	// nothing to put first
 	NeedPlan = "plan"
+	// freemagpie: NeedFree: nothing of the user's is free — no provider
+	// counted free (CountFree) and no model listed free or at $0
+	NeedFree = "free"
 )
 
 // nonChat are words of a model id that isn't for an agent's chat: it
@@ -254,11 +263,13 @@ var TemplateNames = map[string]string{
 	TemplatePlan:    "Plan first",
 	TemplateFast:    "Fastest first",
 	TemplateEven:    "Spread evenly",
+	// freemagpie: the Free Credits Market's own template
+	TemplateFree: "Free first",
 }
 
 // TemplateIDs are the ids agents pick a template's group as, before a
 // number when one is in use.
-var TemplateIDs = map[string]string{TemplateSmart: "smart-split", TemplateThrifty: "cheap-first", TemplateSteady: "never-stuck", TemplatePlan: "plan-first", TemplateFast: "fastest-first", TemplateEven: "spread-evenly"}
+var TemplateIDs = map[string]string{TemplateSmart: "smart-split", TemplateThrifty: "cheap-first", TemplateSteady: "never-stuck", TemplatePlan: "plan-first", TemplateFast: "fastest-first", TemplateEven: "spread-evenly", TemplateFree: "free-first"}
 
 // templateOf is the template kind made of ms, its classifier a decider of
 // ds when there is one.
@@ -315,6 +326,31 @@ func templateOf(kind string, ms []rated, ds []Entry) Template {
 			}
 		}
 		t.Group.Routing = Rotate
+		return t
+	case TemplateFree:
+		// freemagpie: the free models, strongest first, one per provider,
+		// spent by what runs out soonest (FreeExpiring). Free is the
+		// user's word (Provider.CountFree), the vendor's (a model served
+		// at no cost, Entry.Free) or the price's (FreeModel: listed free
+		// or at $0), as the routing that spends it reads it.
+		seen := map[string]bool{}
+		for _, m := range strong {
+			if len(t.Group.Members) == 4 {
+				break
+			}
+			if !m.e.Free && !m.e.Provider.FreeModel(m.e.Model) {
+				continue
+			}
+			if !seen[m.e.Provider.ID] {
+				seen[m.e.Provider.ID] = true
+				t.Group.Members = append(t.Group.Members, m.e.ID)
+			}
+		}
+		if len(t.Group.Members) == 0 {
+			t.Why, t.Need = "nothing of yours is free: count a provider free (CountFree) or add one with a free tier", NeedFree
+			return t
+		}
+		t.Group.Routing = FreeExpiring
 		return t
 	}
 	cheap := cheapest(ms, best)

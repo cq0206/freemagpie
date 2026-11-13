@@ -6657,12 +6657,16 @@ function routingPage(part) {
     plan: ["Plan first", "Subscriptions and token plans first, pay-as-you-go keys only after them"],
     fast: ["Fastest first", "Whichever provider has answered fastest lately goes first"],
     even: ["Spread evenly", "The strongest model, taken in turn over every provider and account that serves it"],
+    // freemagpie: the Free Credits Market's own template
+    free: ["Free first", "The models that cost you nothing, the quota that runs out soonest spent first"],
   };
   const tplName = (tp) => t(TPL[tp.kind]?.[0] || tp.group.name);
   // what a template that can't be made is missing (provider.Need*)
   const tplNeed = (tp) => tp.need === "providers" ? t("Needs models from two providers: {name} is the only one", { name: tp.of })
     : tp.need === "cheap" ? t("Needs a model cheap beside {name}", { name: tp.of })
     : tp.need === "plan" ? t("Needs a subscription or token plan")
+    // freemagpie: the Free First template's want (provider.NeedFree)
+    : tp.need === "free" ? t("Needs something free: a provider counted free, or one with a free tier")
     : tp.need ? t("Add a provider first") : "";
   const tplMembers = (tp) => tp.group.members.map((id) => memberName(id)).join(" → ");
   async function addTemplate(tp) {

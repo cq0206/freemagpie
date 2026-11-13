@@ -31,19 +31,23 @@ const templates = [
   { kind: "plan", group: { id: "plan-first", name: "Plan first", routing: "order" }, why: "no provider of yours is billed by a plan", need: "plan" },
   { kind: "fast", group: { id: "fastest-first", name: "Fastest first", members: ["a/big", "a/mini"], routing: "fast" } },
   { kind: "even", group: { id: "spread-evenly", name: "Spread evenly", members: ["a/big"], routing: "rotate" } },
+  // freemagpie: the Free First template (provider.TemplateFree)
+  { kind: "free", group: { id: "free-first", name: "Free first", members: ["a/mini"], routing: "expiring" } },
 ];
 
 const words = {
-  en: { smart: "Hard to strong, easy to cheap", thrifty: "Cheap first", steady: "Never stuck", add: "Add", edit: "Edit first", added: "Added Hard to strong, easy to cheap", menu: "Templates", need: "Needs models from two providers: A is the only one", plan: "Plan first", fast: "Fastest first", even: "Spread evenly", planNeed: "Needs a subscription or token plan" },
-  zh: { smart: "难题给强模型，简单的给便宜模型", thrifty: "便宜优先", steady: "永不卡住", add: "添加", edit: "先编辑", added: "已添加 难题给强模型，简单的给便宜模型", menu: "模板", need: "需要两家供应商的模型：目前只有 A", plan: "计划优先", fast: "最快优先", even: "均匀分担", planNeed: "需要一个订阅或 Token 套餐" },
-  "zh-TW": { smart: "難題給強模型，簡單的給便宜模型", thrifty: "便宜優先", steady: "永不卡住", add: "新增", edit: "先編輯", added: "已新增 難題給強模型，簡單的給便宜模型", menu: "範本", need: "需要兩家供應商的模型：目前只有 A", plan: "方案優先", fast: "最快優先", even: "平均分擔", planNeed: "需要一個訂閱或 Token 方案" },
-  ja: { smart: "難しい作業は強いモデル、簡単な作業は安いモデルへ", thrifty: "安いモデル優先", steady: "止まらない", add: "追加", edit: "先に編集", added: "難しい作業は強いモデル、簡単な作業は安いモデルへ を追加しました", menu: "テンプレート", need: "2 つのプロバイダーのモデルが必要です：今は A だけです", plan: "プラン優先", fast: "最速優先", even: "均等に分散", planNeed: "サブスクリプションまたはトークンプランが必要です" },
-  de: { smart: "Schweres zum starken, Leichtes zum günstigen Modell", thrifty: "Günstig zuerst", steady: "Nie blockiert", add: "Hinzufügen", edit: "Erst bearbeiten", added: "Schweres zum starken, Leichtes zum günstigen Modell hinzugefügt", menu: "Vorlagen", need: "Braucht Modelle von zwei Anbietern: A ist der einzige", plan: "Tarif zuerst", fast: "Schnellster zuerst", even: "Gleichmäßig verteilen", planNeed: "Braucht ein Abo oder einen Token-Tarif" },
+  en: { smart: "Hard to strong, easy to cheap", thrifty: "Cheap first", steady: "Never stuck", add: "Add", edit: "Edit first", added: "Added Hard to strong, easy to cheap", menu: "Templates", need: "Needs models from two providers: A is the only one", plan: "Plan first", fast: "Fastest first", even: "Spread evenly", planNeed: "Needs a subscription or token plan", free: "Free first", freeNeed: "Needs something free: a provider counted free, or one with a free tier" },
+  zh: { smart: "难题给强模型，简单的给便宜模型", thrifty: "便宜优先", steady: "永不卡住", add: "添加", edit: "先编辑", added: "已添加 难题给强模型，简单的给便宜模型", menu: "模板", need: "需要两家供应商的模型：目前只有 A", plan: "计划优先", fast: "最快优先", even: "均匀分担", planNeed: "需要一个订阅或 Token 套餐", free: "免费优先", freeNeed: "需要免费的模型：把供应商标记为免费，或添加有免费额度的供应商" },
+  "zh-TW": { smart: "難題給強模型，簡單的給便宜模型", thrifty: "便宜優先", steady: "永不卡住", add: "新增", edit: "先編輯", added: "已新增 難題給強模型，簡單的給便宜模型", menu: "範本", need: "需要兩家供應商的模型：目前只有 A", plan: "方案優先", fast: "最快優先", even: "平均分擔", planNeed: "需要一個訂閱或 Token 方案", free: "免費優先", freeNeed: "需要免費的模型：把供應商標記為免費，或新增有免費額度的供應商" },
+  ja: { smart: "難しい作業は強いモデル、簡単な作業は安いモデルへ", thrifty: "安いモデル優先", steady: "止まらない", add: "追加", edit: "先に編集", added: "難しい作業は強いモデル、簡単な作業は安いモデルへ を追加しました", menu: "テンプレート", need: "2 つのプロバイダーのモデルが必要です：今は A だけです", plan: "プラン優先", fast: "最速優先", even: "均等に分散", planNeed: "サブスクリプションまたはトークンプランが必要です", free: "無料優先", freeNeed: "無料のモデルが必要です：プロバイダーを無料として扱うか、無料枠のあるものを追加してください" },
+  de: { smart: "Schweres zum starken, Leichtes zum günstigen Modell", thrifty: "Günstig zuerst", steady: "Nie blockiert", add: "Hinzufügen", edit: "Erst bearbeiten", added: "Schweres zum starken, Leichtes zum günstigen Modell hinzugefügt", menu: "Vorlagen", need: "Braucht Modelle von zwei Anbietern: A ist der einzige", plan: "Tarif zuerst", fast: "Schnellster zuerst", even: "Gleichmäßig verteilen", planNeed: "Braucht ein Abo oder einen Token-Tarif", free: "Kostenlos zuerst", freeNeed: "Braucht etwas Kostenloses: einen Anbieter als kostenlos zählen oder einen mit Gratis-Kontingent" },
 };
 const KEYS = ["Hard to strong, easy to cheap", "A hard task goes to the strongest model, an easy one and compaction to a cheap one", "Cheap first",
   "A cheap model first; the strongest for high reasoning, or when the cheap ones fail", "Never stuck",
   "The strongest model of each provider, each behind the other: one down doesn't stop the agent", "Needs models from two providers: {name} is the only one",
-  "Needs a model cheap beside {name}", "Needs a subscription or token plan", "Plan first", "Subscriptions and token plans first, pay-as-you-go keys only after them", "Fastest first", "Whichever provider has answered fastest lately goes first", "Spread evenly", "The strongest model, taken in turn over every provider and account that serves it", "Add a provider first", "Added {name}", "Start from a template: made of your own models, added in a click", "Edit first", "Templates"];
+  "Needs a model cheap beside {name}", "Needs a subscription or token plan", "Plan first", "Subscriptions and token plans first, pay-as-you-go keys only after them", "Fastest first", "Whichever provider has answered fastest lately goes first", "Spread evenly", "The strongest model, taken in turn over every provider and account that serves it", "Add a provider first", "Added {name}", "Start from a template: made of your own models, added in a click", "Edit first", "Templates",
+  // freemagpie: the Free First template (provider.TemplateFree)
+  "Free first", "The models that cost you nothing, the quota that runs out soonest spent first", "Needs something free: a provider counted free, or one with a free tier"];
 
 function serve(lang, posts, mine = 0) {
   // a group magpie found is no group of the user's: the cards still show
@@ -100,9 +104,9 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await page.route("**/*", serve(lang, posts));
       await page.goto("http://magpie.test/?view=groups");
       const cards = page.locator(".rt-gtpl-card");
-      await cards.nth(5).waitFor();
+      await cards.nth(6).waitFor();
       await page.waitForTimeout(500);
-      assert.deepEqual(await cards.evaluateAll((cs) => cs.map((c) => c.dataset.kind)), ["smart", "thrifty", "steady", "plan", "fast", "even"]);
+      assert.deepEqual(await cards.evaluateAll((cs) => cs.map((c) => c.dataset.kind)), ["smart", "thrifty", "steady", "plan", "fast", "even", "free"]);
       const smart = page.locator(".rt-gtpl-card[data-kind=smart]"), steady = page.locator(".rt-gtpl-card[data-kind=steady]");
       assert.equal((await smart.locator("b").textContent()).trim(), w.smart);
       assert.equal((await smart.locator(".mem").textContent()).trim(), "Big → Mini");
@@ -113,6 +117,9 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert.deepEqual(await page.locator(".rt-gtpl-card[data-kind=plan] b, .rt-gtpl-card[data-kind=fast] b, .rt-gtpl-card[data-kind=even] b").allTextContents(), [w.plan, w.fast, w.even]);
       assert.equal((await page.locator(".rt-gtpl-card[data-kind=plan] .why").textContent()).trim(), w.planNeed);
       assert.equal((await page.locator(".rt-gtpl-card[data-kind=fast] .mem").textContent()).trim(), "Big → Mini");
+      // freemagpie: the free template, its members and its routing
+      assert.equal((await page.locator(".rt-gtpl-card[data-kind=free] b").textContent()).trim(), w.free);
+      assert.equal((await page.locator(".rt-gtpl-card[data-kind=free] .mem").textContent()).trim(), "Mini");
       // every card whole on a narrow window, nothing scrolls sideways
       for (const box of await cards.evaluateAll((cs) => cs.map((c) => c.getBoundingClientRect().toJSON()))) {
         assert(box.x >= 0 && box.right <= 420, `card off the window: ${JSON.stringify(box)}`);

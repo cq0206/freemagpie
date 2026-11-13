@@ -2854,6 +2854,10 @@ const I18N = {
     "Whichever provider has answered fastest lately goes first": "最近响应最快的供应商排在最前",
     "Spread evenly": "均匀分担",
     "The strongest model, taken in turn over every provider and account that serves it": "最强模型，在所有提供它的供应商和账号间轮流使用",
+    // freemagpie: the Free First template (provider.TemplateFree); its
+    // name reuses the rotation's own "Free first" above
+    "The models that cost you nothing, the quota that runs out soonest spent first": "全部用不花钱的模型，快过期的免费额度先用",
+    "Needs something free: a provider counted free, or one with a free tier": "需要免费的模型：把供应商标记为免费，或添加有免费额度的供应商",
     "Added {name}": "已添加 {name}",
     "Templates": "模板",
     "Copy of {name}": "{name} 的副本",
@@ -5114,6 +5118,12 @@ const I18N = {
     "How long ago the model last wrote something. A quiet reply is not a failed one": "模型最近一次写出内容是多久以前。安静不代表失败",
     // Insights › Masking (plugins/redact), words said elsewhere too
     "Masking": "脱敏",
+    // freemagpie: the Free Credits Market (plugins/credits), its name said
+    // by the sidebar too
+    "Free Credits Market": "免费积分市场",
+    "Free AI credits of every product, in one list: claim them at their official page, and add the ones with an API to magpie": "每个产品的免费 AI 积分收在一个列表里：去官方页面领取，带 API 的可以直接添加到 magpie",
+    "1 offer saved": "已收藏 1 个福利",
+    "{n} offers saved": "已收藏 {n} 个福利",
     "Each request masking changed, what the vendor saw, and how, on Insights › Masking": "每条被脱敏的请求、厂商看到的样子和遮法，都在 观测 › 脱敏",
     "Settings › Privacy": "设置 › 隐私",
     "By request": "按请求",
@@ -7969,6 +7979,10 @@ const I18N = {
     "Whichever provider has answered fastest lately goes first": "最近回應最快的供應商排在最前",
     "Spread evenly": "平均分擔",
     "The strongest model, taken in turn over every provider and account that serves it": "最強模型，在所有提供它的供應商和帳號間輪流使用",
+    // freemagpie: the Free First template (provider.TemplateFree); its
+    // name reuses the rotation's own "Free first" above
+    "The models that cost you nothing, the quota that runs out soonest spent first": "全部用不花錢的模型，快到期的免費額度先用",
+    "Needs something free: a provider counted free, or one with a free tier": "需要免費的模型：把供應商標記為免費，或新增有免費額度的供應商",
     "Added {name}": "已新增 {name}",
     "Templates": "範本",
     "Copy of {name}": "{name} 的副本",
@@ -10226,6 +10240,12 @@ const I18N = {
     "How long ago the model last wrote something. A quiet reply is not a failed one": "模型最近一次寫出內容是多久以前。安靜不代表失敗",
     // Insights › Masking (plugins/redact), words said elsewhere too
     "Masking": "脫敏",
+    // freemagpie: the Free Credits Market (plugins/credits), its name said
+    // by the sidebar too
+    "Free Credits Market": "免費積分市場",
+    "Free AI credits of every product, in one list: claim them at their official page, and add the ones with an API to magpie": "每個產品的免費 AI 積分收在一個列表裡：去官方頁面領取，帶 API 的可以直接新增到 magpie",
+    "1 offer saved": "已收藏 1 個福利",
+    "{n} offers saved": "已收藏 {n} 個福利",
     "Each request masking changed, what the vendor saw, and how, on Insights › Masking": "每則被脫敏的請求、廠商看到的樣子和遮法，都在 觀測 › 脫敏",
     "Settings › Privacy": "設定 › 隱私",
     "By request": "按請求",
@@ -13062,6 +13082,10 @@ const I18N = {
     "Whichever provider has answered fastest lately goes first": "直近で最も速く応答したプロバイダーが先頭",
     "Spread evenly": "均等に分散",
     "The strongest model, taken in turn over every provider and account that serves it": "最強モデルを、それを提供する全プロバイダーとアカウントで順番に使う",
+    // freemagpie: the Free First template (provider.TemplateFree); its
+    // name reuses the rotation's own "Free first" above
+    "The models that cost you nothing, the quota that runs out soonest spent first": "無料のモデルだけで構成し、失効の近い無料枠から使います",
+    "Needs something free: a provider counted free, or one with a free tier": "無料のモデルが必要です：プロバイダーを無料として扱うか、無料枠のあるものを追加してください",
     "Added {name}": "{name} を追加しました",
     "Templates": "テンプレート",
     "Copy of {name}": "{name} のコピー",
@@ -15340,6 +15364,12 @@ const I18N = {
     "How long ago the model last wrote something. A quiet reply is not a failed one": "モデルが最後に内容を書いたのはいつか。静かなのは失敗ではない",
     // Insights › Masking (plugins/redact), words said elsewhere too
     "Masking": "マスク",
+    // freemagpie: the Free Credits Market (plugins/credits), its name said
+    // by the sidebar too
+    "Free Credits Market": "無料クレジットマーケット",
+    "Free AI credits of every product, in one list: claim them at their official page, and add the ones with an API to magpie": "あらゆる製品の無料 AI クレジットを一覧にまとめます。公式ページで受け取り、API 付きのものは magpie に直接追加できます",
+    "1 offer saved": "1 件のオファーを保存済み",
+    "{n} offers saved": "{n} 件のオファーを保存済み",
     "Each request masking changed, what the vendor saw, and how, on Insights › Masking": "マスクしたリクエストごとに、ベンダーに届いた姿とマスクの仕方を 観測 › マスク で見られます",
     "Settings › Privacy": "設定 › プライバシー",
     "By request": "リクエスト別",
@@ -18186,6 +18216,10 @@ const I18N = {
     "Whichever provider has answered fastest lately goes first": "Der Anbieter, der zuletzt am schnellsten geantwortet hat, kommt zuerst",
     "Spread evenly": "Gleichmäßig verteilen",
     "The strongest model, taken in turn over every provider and account that serves it": "Das stärkste Modell, reihum über alle Anbieter und Konten, die es anbieten",
+    // freemagpie: the Free First template (provider.TemplateFree); its
+    // name reuses the rotation's own "Free first" above
+    "The models that cost you nothing, the quota that runs out soonest spent first": "Nur Modelle, die dich nichts kosten; das zuerst ablaufende Freikontingent wird zuerst verbraucht",
+    "Needs something free: a provider counted free, or one with a free tier": "Braucht etwas Kostenloses: einen Anbieter als kostenlos zählen oder einen mit Gratis-Kontingent",
     "Added {name}": "{name} hinzugefügt",
     "Templates": "Vorlagen",
     "Copy of {name}": "Kopie von {name}",
@@ -20454,6 +20488,12 @@ const I18N = {
     "How long ago the model last wrote something. A quiet reply is not a failed one": "Wie lange es her ist, dass das Modell zuletzt etwas geschrieben hat. Still heißt nicht gescheitert",
     // Insights › Masking (plugins/redact), words said elsewhere too
     "Masking": "Maskierung",
+    // freemagpie: the Free Credits Market (plugins/credits), its name said
+    // by the sidebar too
+    "Free Credits Market": "Kostenlose-Credits-Markt",
+    "Free AI credits of every product, in one list: claim them at their official page, and add the ones with an API to magpie": "Kostenlose KI-Credits aller Produkte in einer Liste: auf der offiziellen Seite abholen, und die mit API direkt zu magpie hinzufügen",
+    "1 offer saved": "1 Angebot gemerkt",
+    "{n} offers saved": "{n} Angebote gemerkt",
     "Each request masking changed, what the vendor saw, and how, on Insights › Masking": "Jede maskierte Anfrage, was der Anbieter sah und wie, unter Einblick › Maskierung",
     "Settings › Privacy": "Einstellungen › Datenschutz",
     "By request": "Nach Anfrage",

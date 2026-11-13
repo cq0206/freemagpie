@@ -142,6 +142,45 @@ func TestRecipeTemplates(t *testing.T) {
 	}
 }
 
+// freemagpie: the Free First template (docs/freemagpie/ARCHITECTURE.md
+// §1.4): the free models, one per provider, under FreeExpiring — free by
+// the user's word (CountFree), the vendor's (Entry.Free) or the price's
+// (FreeModel: listed at $0), as FreeExpiring spends it.
+func TestFreeFirstTemplate(t *testing.T) {
+	counted := tm("modelscope", "qwen3-235b", 20, false, "2026-08-01")
+	counted.e.Provider.CountFree = true
+	freeServed := tm("openrouter", "meta-llama-4-70b:free", 0, false, "2026-05-01")
+	freeServed.e.Free = true
+	paid := tm("openai", "gpt-6.1", 40, true, "2026-09-20")
+
+	tp := templateOf(TemplateFree, []rated{paid, freeServed, counted}, nil)
+	if tp.Why != "" || tp.Group.Routing != FreeExpiring {
+		t.Fatalf("free = %+v, want expiring with members", tp)
+	}
+	// strongest first among the free: the counted provider's model is
+	// dearer than the free-served one, so it comes first
+	if want := []string{"modelscope/qwen3-235b", "openrouter/meta-llama-4-70b:free"}; !slices.Equal(tp.Group.Members, want) {
+		t.Errorf("free members = %v, want %v", tp.Group.Members, want)
+	}
+	// the paid model stays out
+	for _, m := range tp.Group.Members {
+		if m == paid.e.ID {
+			t.Errorf("the paid model is in the free group: %v", tp.Group.Members)
+		}
+	}
+	// nothing free: the template says what is missing, and has no members
+	if tp := templateOf(TemplateFree, []rated{paid}, nil); tp.Need != NeedFree || len(tp.Group.Members) > 0 || tp.Why == "" {
+		t.Errorf("nothing free: %+v", tp)
+	}
+	// the vendor's word (Entry.Free, as Served() carries it) is free
+	// alone: one provider's free model still makes the group
+	freeByWord := tm("nvidia", "nim-free-model", 0, false, "")
+	freeByWord.e.Free = true
+	if tp := templateOf(TemplateFree, []rated{freeByWord}, nil); tp.Why != "" || !slices.Equal(tp.Group.Members, []string{"nvidia/nim-free-model"}) {
+		t.Errorf("free by the vendor's word alone: %+v", tp)
+	}
+}
+
 func TestTemplatesSayWhatIsMissing(t *testing.T) {
 	if tp := templateOf(TemplateSmart, nil, nil); tp.Need != NeedProvider || len(tp.Group.Members) > 0 {
 		t.Errorf("no models: %+v", tp)
