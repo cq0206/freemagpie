@@ -230,6 +230,10 @@ func TestSettingsSaveKeepsWhatItDoesNotSend(t *testing.T) {
 	was.HTTPS = true                                  // Network and sharing's settings/https
 	// Settings > Usage's Bark row has its own route (settings/bark)
 	was.BarkServer, was.BarkKey, was.BarkDaily = "https://bark.example.com", "kept", "21:30"
+	// freemagpie: the Free Credits Market's cloud (docs/freemagpie/API.md),
+	// never sent by a page: which cloud a computer talks to is that
+	// computer's own (KeepOwn)
+	was.FreeMagpieURL, was.FreeMagpieQuota = "https://cloud.freemagpie.example", true
 	// the Routing groups page's defaults for every group (groups/defaults)
 	was.GroupSink, was.GroupFirstToken, was.GroupPatience = true, 30, 120
 	if err := settings.Save(was); err != nil {

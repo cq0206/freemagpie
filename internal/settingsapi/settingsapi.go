@@ -289,6 +289,11 @@ func Merge(body []byte, cur settings.Settings, web bool) (settings.Settings, err
 	in.LANKeyID = cur.LANKeyID
 	// Bark has its own route (bark); the page never sees its key
 	in.BarkServer, in.BarkKey, in.BarkDaily = cur.BarkServer, cur.BarkKey, cur.BarkDaily
+	// freemagpie: the FreeMagpie cloud the Free Credits Market talks to,
+	// and whether its quota snapshots are sent (docs/freemagpie/API.md):
+	// which cloud a computer talks to is where that computer is
+	// (settings.KeepOwn), never a page's to move
+	in.FreeMagpieURL, in.FreeMagpieQuota = cur.FreeMagpieURL, cur.FreeMagpieQuota
 
 	in.Port = cur.Port                           // set on its own (port), which moves the gateway
 	in.CORSOrigins = cur.CORSOrigins             // set on its own (cors)

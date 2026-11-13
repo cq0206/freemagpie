@@ -246,6 +246,9 @@ var notYet = map[string]string{
 	"GET /api/cli":                               A,  // api.go
 	"GET /api/drift":                             A,  // api.go
 	"GET /api/notices":                           W,  // api.go
+	"GET /api/credits/offers":                    W,  // credits.go: the Free Credits Market page's own catalog, freemagpie's client answers it
+	"GET /api/credits/state":                     W,  // credits.go: the page's own saved offers
+	"POST /api/credits/state":                    W,  // credits.go
 	"GET /api/omarchy":                           W,  // api.go
 	"GET /api/quit":                              W,  // api.go: the window's Quit question
 	"GET /api/remote":                            W,  // remote.go: another magpie opened in a window of the app

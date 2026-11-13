@@ -1,0 +1,98 @@
+/* freemagpie // The Free Credits Market page's styles. It draws with the
+   app's own rows and cards where it can (the .list/.row/.who shapes);
+   these are only what the catalog's own layout needs. */
+
+.crd-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.crd-search { flex: 1 1 220px; }
+.crd-search input[type="search"] {
+  width: 100%;
+}
+
+.crd-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* the filter pickers borrow the Settings row's badge look (app.css's
+   .row.pref .proto.pick, scoped there), said for this page's own place */
+.crd-filters .proto.pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 26px;
+  padding: 0 6px 0 9px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--fg-2);
+  border: 0;
+  border-radius: 7px;
+  background: var(--pill);
+  white-space: nowrap;
+  cursor: default;
+}
+.crd-filters .proto.pick svg { opacity: .7; }
+.crd-filters .proto.pick:hover { color: var(--fg); background: var(--pill-hover); }
+
+.crd-note {
+  margin: 0 0 12px;
+  color: var(--muted, inherit);
+  font-size: 12px;
+}
+
+.crd-note .crd-err { color: var(--red, #c33); }
+
+.crd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* one offer: the product on the left, what it gives and its rules in
+   the middle, the actions at the end */
+.crd-offer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--line, #e4e4e7);
+  border-radius: 12px;
+  background: var(--card, #fff);
+}
+
+.crd-offer[data-state="claimed"] { opacity: .7; }
+
+.crd-offer .who { flex: 1 1 200px; min-width: 0; }
+
+.crd-kinds {
+  display: flex;
+  gap: 6px;
+  flex-basis: 100%;
+}
+
+.crd-kind {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line, #e4e4e7);
+  color: var(--fg-2, #4a4a50);
+}
+
+.crd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+@media (max-width: 760px) {
+  .crd-actions { margin-left: 0; }
+}

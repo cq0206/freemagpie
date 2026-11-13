@@ -754,6 +754,19 @@ type Settings struct {
 	BarkServer string `json:"barkServer,omitempty"`
 	BarkKey    string `json:"barkKey,omitempty"`
 	BarkDaily  string `json:"barkDaily,omitempty"`
+	// FreeMagpieURL is the FreeMagpie Cloud the desktop's Free Credits
+	// Market talks to (docs/freemagpie/API.md): "" is the public one
+	// (freemagpie.DefaultURL), "off" is none — the page then shows only
+	// its cache, and nothing of magpie's own changes (§1.2.1: the cloud
+	// is never on the way of anything local). This computer's own
+	// (KeepOwn): which cloud a computer talks to is where that computer
+	// is, not a choice to carry between them.
+	FreeMagpieURL string `json:"freeMagpieURL,omitempty"`
+	// FreeMagpieQuota, off until the user turns it on, is whether the
+	// sanitized quota snapshots of docs/freemagpie/API.md §5 are sent:
+	// windows' shares and reset times of the products the user has, and
+	// nothing else. It follows FreeMagpieURL being set.
+	FreeMagpieQuota bool `json:"freeMagpieQuota,omitempty"`
 	// PlainNames has the model lists magpie gives agents name each model
 	// by its name alone, without its provider's or "routing group" after it
 	// (#335) — but for two in one list that would read the same, which keep
@@ -1631,6 +1644,7 @@ func (s *Settings) KeepOwn(cur Settings) {
 	s.FetchPrivate = cur.FetchPrivate
 	s.SessionTerminal = cur.SessionTerminal
 	s.PanelShortcut = cur.PanelShortcut
+	s.FreeMagpieURL, s.FreeMagpieQuota = cur.FreeMagpieURL, cur.FreeMagpieQuota
 	s.RedactModel, s.RedactModelName, s.RedactModelScore = cur.RedactModel, cur.RedactModelName, cur.RedactModelScore
 	s.RedactModelOff, s.RedactModelAuto = cur.RedactModelOff, cur.RedactModelAuto
 	s.ClaudeRunsMost = cur.ClaudeRunsMost

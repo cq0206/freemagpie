@@ -20,6 +20,8 @@ const assets = path.resolve(__dirname, "../assets");
 // as plugins/*'s manifests say them, in pluginrt.Registered's order (by id)
 const PLUGINS = [
   { id: "budget", name: "Key limits", sub: "Hold each gateway key to the tokens or estimated cost you set for it", one: "1 key with a limit", many: "{n} keys with a limit" },
+  // freemagpie: the Free Credits Market (docs/freemagpie/ARCHITECTURE.md)
+  { id: "credits", name: "Free Credits Market", sub: "Free AI credits of every product, in one list: claim them at their official page, and add the ones with an API to magpie", one: "1 offer saved", many: "{n} offers saved" },
   { id: "gateway", name: "Gateway page", sub: "The gateway's state and keys, how to connect a client, its models and recent calls", one: "1 gateway key", many: "{n} gateway keys" },
   { id: "groups", name: "Routing groups", sub: "Several models agents pick as one: each request goes to the right one, and to the next when one fails", one: "1 group in use", many: "{n} groups in use" },
   { id: "library", name: "Library", sub: "Instructions, MCP servers, skills and hooks, kept once and given to every agent", one: "1 item given to agents", many: "{n} items given to agents" },
@@ -38,7 +40,7 @@ const PLUGINS = [
 // and Usage pages, the routing strategies, the gateway middleware, privacy
 // masking, web search, key limits and plugin tools, which are essential,
 // and two routing groups the user made
-const START = { budget: [true, 0], gateway: [true, 0], groups: [false, 2], library: [false, 0], middleware: [true, 0], otel: [false, 0], redact: [true, 0], rotation: [true, 0], routing: [true, 0], search: [true, 0], sessions: [false, 0], tools: [true, 0], usage: [true, 0], warmups: [false, 0] };
+const START = { budget: [true, 0], credits: [true, 0], gateway: [true, 0], groups: [false, 2], library: [false, 0], middleware: [true, 0], otel: [false, 0], redact: [true, 0], rotation: [true, 0], routing: [true, 0], search: [true, 0], sessions: [false, 0], tools: [true, 0], usage: [true, 0], warmups: [false, 0] };
 
 // the Gateway page's settings, as pluginrt.SchemaOf makes them
 const GATEWAY_SCHEMA = {
@@ -54,7 +56,7 @@ function builtins(st, broken, config) {
     const f = { id: p.id, name: p.name, sub: p.sub, on, chosen, source: inUse > 0 && !chosen ? "in use" : "preset", state: on ? "active" : "off", inUse, use: inUse === 1 ? p.one : inUse > 1 ? p.many : undefined, broken };
     if (p.id === "gateway") Object.assign(f, { schema: GATEWAY_SCHEMA, config });
     // as the manifests say them: the page each has, or is used on
-    const page = { gateway: "gateway", library: "library", redact: "masking", routing: "routing", sessions: "sessions", usage: "usage" }[p.id];
+    const page = { credits: "credits", gateway: "gateway", library: "library", redact: "masking", routing: "routing", sessions: "sessions", usage: "usage" }[p.id];
     const opens = { budget: "gateway", groups: "groups", rotation: "providers", warmups: "providers", middleware: "plugins", tools: "plugins" }[p.id];
     if (page) f.page = page;
     if (opens) f.opens = opens;
@@ -119,7 +121,8 @@ const viewShown = (page) => page.evaluate(() => [...document.querySelectorAll("m
 // the tabs with Sessions and Library off, the preset's masking on
 // (Routing groups has a tab of its own in the sidebar only, from 1024
 // points; under it Routing's page opens them)
-const KEPT = ["agents", "providers", "routing", "gateway", "usage", "masking", "plugins"];
+// freemagpie: the Free Credits Market is on too
+const KEPT = ["agents", "providers", "routing", "gateway", "usage", "masking", "credits", "plugins"];
 const keptAt = (width) => (width >= 1024 ? KEPT.flatMap((k) => (k === "routing" ? [k, "groups"] : [k])) : KEPT);
 const rowsOf = (page) => page.evaluate(() => [...document.querySelectorAll("#builtinList .feat-row")].map((r) => {
   const b = r.querySelector('[role="switch"]');
@@ -188,7 +191,10 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         }
         const us = rows.find((r) => r.id === "usage");
         assert.deepEqual([us.on, us.disabled], ["true", false], `${where}: the Usage page, on`);
-        for (const r of rows.filter((r) => !["budget", "groups", "gateway", "middleware", "redact", "rotation", "routing", "search", "tools", "usage"].includes(r.id))) assert.deepEqual([r.on, r.disabled, r.why], ["false", false, ""], `${where}: ${r.id}`);
+        // freemagpie: the Free Credits Market, on like the Usage page
+        const cr = rows.find((r) => r.id === "credits");
+        assert.deepEqual([cr.on, cr.disabled], ["true", false], `${where}: the Free Credits Market, on`);
+        for (const r of rows.filter((r) => !["budget", "credits", "groups", "gateway", "middleware", "redact", "rotation", "routing", "search", "tools", "usage"].includes(r.id))) assert.deepEqual([r.on, r.disabled, r.why], ["false", false, ""], `${where}: ${r.id}`);
         await page.locator('#builtinList [data-id="groups"] [role="switch"]').click({ force: true });
         await page.waitForTimeout(100);
         assert.deepEqual(posts, [], `${where}: a locked switch posts nothing`);

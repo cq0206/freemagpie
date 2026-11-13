@@ -56,14 +56,16 @@ func TestBuiltinSwitch(t *testing.T) {
 		if err := json.Unmarshal(rec.Body.Bytes(), &out); err != nil {
 			t.Fatal(err)
 		}
-		if len(out) != 14 {
+		if len(out) != 15 {
 			t.Fatalf("the built-ins: %+v", out)
 		}
 		for _, b := range out {
 			// the Gateway, Routing and Usage pages, the routing strategies,
 			// the gateway middleware, privacy masking, web search, key
 			// limits and plugin tools are essential: on in every preset
-			if b.On != (b.ID == "budget" || b.ID == "library" || b.ID == "gateway" || b.ID == "middleware" || b.ID == "redact" || b.ID == "rotation" || b.ID == "routing" || b.ID == "search" || b.ID == "tools" || b.ID == "usage") || b.On != (b.State == pluginrt.Active) {
+			// (freemagpie: the Free Credits Market is this fork's own, on
+			// in every preset too)
+			if b.On != (b.ID == "budget" || b.ID == "library" || b.ID == "credits" || b.ID == "gateway" || b.ID == "middleware" || b.ID == "redact" || b.ID == "rotation" || b.ID == "routing" || b.ID == "search" || b.ID == "tools" || b.ID == "usage") || b.On != (b.State == pluginrt.Active) {
 				t.Fatalf("after library on: %+v", out)
 			}
 		}
@@ -137,6 +139,11 @@ func TestBootSaysBuiltinsOff(t *testing.T) {
 	}
 	if b := boot(); !strings.Contains(b, `"featuresOff":["groups","otel","sessions","warmups"]`) {
 		t.Fatalf("Essentials picked: %s", b)
+	}
+	// freemagpie: the Free Credits Market is essential, so Essentials
+	// leaves it on
+	if b := boot(); strings.Contains(b, `"credits"`) {
+		t.Fatalf("Essentials turned the Free Credits Market off: %s", b)
 	}
 }
 
