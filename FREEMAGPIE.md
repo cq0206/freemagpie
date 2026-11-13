@@ -51,6 +51,21 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 | 1 | 品牌标识 | 见 git diff | magpie → FreeMagpie（名称/标题/图标，不含二进制 id `magpie` 与路径 `~/.config/magpie`） | 待做 |
 | 2 | 文档 | FREEMAGPIE.md | 本文件 | 已做 |
 | 3 | 官网 | site/ | 独立域名站点（暂不改上游 site/，见「官网」一节） | 已做 |
+| 4 | 免费积分市场 | plugins/credits/, internal/gui/credits.go, internal/gui/credits_test.go, internal/gui/assets/plugins/credits/, internal/gui/tests/credits-page.test.cjs, internal/gui/api.go（+1 行路由）, plugins/all/all.go（+1 行 import）, internal/gui/assets/index.html, internal/gui/assets/i18n.js, internal/gui/builtins_test.go（内置插件数 + credits 必备）, internal/gui/tests/builtins.test.cjs, internal/settings/settings.go + internal/settingsapi/settingsapi.go（FreeMagpieURL/FreeMagpieQuota 字段）, internal/cli/settings_parity_test.go, internal/gui/settings_keep_test.go | Free Credits Market 内置插件 + 云端目录客户端 | 已做 |
+| 5 | 云端客户端 | internal/freemagpie/ | 纯客户端包（catalog/state/cache，不 import internal/gateway），测试齐 | 已做 |
+| 6 | Free First 模板 | internal/provider/grouptemplate.go（TemplateFree 分支 + NeedFree）+ grouptemplate_test.go, internal/gui/assets/plugins/routing/client.js, internal/gui/assets/i18n.js, internal/gui/tests/group-template.test.cjs | 一个分组模板（routing=expiring，成员为免费模型：CountFree / Entry.Free / FreeModel），复用 routes.FreeExpiring | 已做 |
+| 7 | 架构文档 | docs/freemagpie/ | FreeMagpie 架构方案（本分支的产品方向文档） | 已做 |
+
+> 第 4-6 项的设计依据见 docs/freemagpie/ARCHITECTURE.md。merge 冲突时：
+> `internal/gui/api.go` 与 `plugins/all/all.go` 各只有一行，冲突取两边；
+> `internal/provider/grouptemplate.go` 的 templateOf 尾部追加一个 case，
+> 常量/名字表各追加一行，冲突取两边；`internal/gui/assets/i18n.js`
+> 的 freemagpie 块是注释标记的独立条目，冲突取两边；其余为新增目录，
+> 上游不会碰。
+>
+> 网站架构（2026-11-13 定）：freemagpie-web 照上游 usemagpie.ai 的
+> Cloudflare Workers + 静态 HTML + D1 架构做（不用 Next.js），公共目录在
+> CF 边缘、账户数据在 Go 云端，见 ARCHITECTURE.md §5。
 
 ## 品牌改动的边界（重要）
 
