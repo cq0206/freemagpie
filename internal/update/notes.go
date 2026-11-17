@@ -27,17 +27,21 @@ type Note struct {
 
 // NotesFeed is where the notes of past releases are listed: beside the
 // update feed, on magpie's site. MAGPIE_NOTES_FEED points it elsewhere.
+// freemagpie: release builds override these addresses through -ldflags -X.
+var defaultNotesFeed = Site + "/api/notes"
+var releasePagePrefix = "https://github.com/yetone/magpie-releases/releases/tag/v"
+
 func NotesFeed() string {
 	if f := os.Getenv("MAGPIE_NOTES_FEED"); f != "" {
 		return f
 	}
-	return Site + "/api/notes"
+	return defaultNotesFeed
 }
 
 // ReleasePage is version's page on GitHub, where its notes are when the
 // site can't give them (#661).
 func ReleasePage(version string) string {
-	return "https://github.com/yetone/magpie-releases/releases/tag/v" + strings.TrimPrefix(strings.TrimSpace(version), "v")
+	return releasePagePrefix + strings.TrimPrefix(strings.TrimSpace(version), "v")
 }
 
 // NotesBetween asks the site for the notes of every release after after

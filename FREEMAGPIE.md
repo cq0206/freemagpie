@@ -54,6 +54,7 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 | 4 | 免费积分市场 | plugins/credits/, internal/gui/credits.go, internal/gui/credits_test.go, internal/gui/assets/plugins/credits/, internal/gui/tests/credits-page.test.cjs, internal/gui/api.go（+1 行路由）, plugins/all/all.go（+1 行 import）, internal/gui/assets/index.html, internal/gui/assets/i18n.js, internal/gui/builtins_test.go（内置插件数 + credits 必备）, internal/gui/tests/builtins.test.cjs, internal/settings/settings.go + internal/settingsapi/settingsapi.go（FreeMagpieURL/FreeMagpieQuota 字段）, internal/cli/settings_parity_test.go, internal/gui/settings_keep_test.go | Free Credits Market 内置插件 + 云端目录客户端 | 已做 |
 | 5 | 云端客户端 | internal/freemagpie/ | 纯客户端包（catalog/state/cache，不 import internal/gateway），测试齐 | 已做 |
 | 6 | Free First 模板 | internal/provider/grouptemplate.go（TemplateFree 分支 + NeedFree）+ grouptemplate_test.go, internal/gui/assets/plugins/routing/client.js, internal/gui/assets/i18n.js, internal/gui/tests/group-template.test.cjs | 一个分组模板（routing=expiring，成员为免费模型：CountFree / Entry.Free / FreeModel），复用 routes.FreeExpiring | 已做 |
+| 8 | 独立发布 | .github/workflows/freemagpie-release.yml, build/freemagpie/, internal/update/update.go + notes.go + freemagpie_test.go | 独立构建 13 个安装包、校验和、更新元数据；通过链接器覆盖更新源与发行页，保留上游其他服务地址 | 已做 |
 | 7 | 架构文档 | docs/freemagpie/ | FreeMagpie 架构方案（本分支的产品方向文档） | 已做 |
 
 > 第 4-6 项的设计依据见 docs/freemagpie/ARCHITECTURE.md。merge 冲突时：
@@ -96,15 +97,46 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 **已落地**（[cq0206/freemagpie-site](https://github.com/cq0206/freemagpie-site)，
 本地检出在主仓库旁的 `freemagpie-site/`，已加入 .gitignore）：
 
-- 单页 `index.html`（无构建步骤、无框架、无重图，~14 KB），GitHub Pages
-  从 `main` 分支根目录发布，CNAME 指向 freemagpie.com，已强制开启跳转
-- logo 复用上游 `site/public/img/magpie-small.svg`（MIT），加
-  `fill="currentColor"` 适配深浅色
-- 用户侧还需一步：**到域名注册商给 freemagpie.com 添加 DNS 记录**
-  （以仓库 Settings → Pages 显示为准）：
-  `@` A 记录 → `185.199.108.153` / `185.199.109.153` / `185.199.110.153` /
-  `185.199.111.153`；`www` CNAME → `cq0206.github.io`。
-  DNS 生效、证书签发后再到 Settings → Pages 勾选 Enforce HTTPS。
+- 官网由独立仓库的 Cloudflare Workers 静态资产部署，不需要前端构建。
+- 地址：`https://freemagpie.com`、`https://www.freemagpie.com`。
+- 域名仍在阿里云续费，DNS 已由 Cloudflare 管理：
+  `arely.ns.cloudflare.com`、`brady.ns.cloudflare.com`。
+- 官网下载使用本仓库 Releases 的已发布安装包；`/api/latest` 与
+  `/api/notes` 提供本发行版的更新元数据，不能指向上游发行版。
+
+## 独立发行
+
+FreeMagpie 的发行分支是 `freemagpie`，使用 **`freemagpie-vX.Y.Z`** 标签，
+不要创建 `v*` 标签（会触发上游发布交接工作流）。与上游 code-standards 的
+上游发行条件相对应，本发行版要求：标签来自 `freemagpie`；同一次工作流的
+全量 nogui 测试、平台构建和原生 smoke 检查通过后，才在
+`cq0206/freemagpie` 发布完整资产并标为 Latest。不借用上游的签名服务。
+
+```sh
+# 在 freemagpie 分支提交并推送发布配置后：
+git tag freemagpie-v0.1.0
+git push origin freemagpie-v0.1.0
+# 等 FreeMagpie Release 全部通过，确认 Releases 包含 13 个程序文件、
+# LICENSE、THIRD_PARTY_NOTICES、latest.json、notes.json、SHA256SUMS。
+```
+
+`build/freemagpie/package.sh` 使用原有 Makefile，只覆盖版本与更新地址。
+`manifest.py` 拒绝缺包、空包，计算真实 SHA-256。各平台原生构建桌面包；
+Windows 桌面包交叉编译后在 Windows runner 执行 x64 smoke 检查。
+Windows ARM64 与 Android 包只交叉编译，尚未做原生设备启动检查。
+首次发行固定在现有 fork 的源代码快照，不把上游同步夹入发布变更。
+
+macOS 包只有 ad-hoc 签名，未经 Apple 公证；Windows 没有发布者签名。
+不得宣传为已公证、免安全提示。官网与发行说明写明安装步骤。
+保持 `magpie.app`、二进制名、配置目录与协议兼容；完整品牌替换另做。
+
+官网发布步骤（在 `freemagpie-site` 仓库）：
+
+1. 下载同一发行版的 `latest.json`、`notes.json`，按更新接口结构保存到
+   `api/latest`、`api/notes`；这些文件的无扩展名响应须为 JSON。
+2. 更新下载按钮和版本信息，校验所有链接对应真实非空资产。
+3. `wrangler deploy`，在线验证 HTTPS、更新接口、文件下载及 SHA-256。
+
 
 ## 构建
 
@@ -116,7 +148,7 @@ export GOFLAGS=-mod=mod
 export GOPROXY=https://goproxy.cn,direct
 
 make build        # 桌面版（macOS 需 Xcode CLT）
-make nogui        # 纯终端版（交叉编译友好）
+make cli          # 纯终端版（交叉编译友好）
 go test ./...     # 测试（跑全量很慢，按包跑）
 ```
 

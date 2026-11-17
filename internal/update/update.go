@@ -43,13 +43,17 @@ import (
 // Site is magpie's home; its /api/latest is the update feed.
 const Site = "https://usemagpie.ai"
 
+// freemagpie: distributions set their own update feed with -ldflags -X,
+// without moving the upstream services that also use Site.
+var defaultFeed = Site + "/api/latest"
+
 // Feed is where the newest release is described. MAGPIE_UPDATE_FEED points
 // it elsewhere, for testing an update against a local server.
 func Feed() string {
 	if f := os.Getenv("MAGPIE_UPDATE_FEED"); f != "" {
 		return f
 	}
-	return Site + "/api/latest"
+	return defaultFeed
 }
 
 // Release is one published version.

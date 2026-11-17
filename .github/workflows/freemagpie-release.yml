@@ -1,0 +1,136 @@
+name: FreeMagpie Release
+
+# freemagpie: the separate tag prefix never invokes upstream's v* workflow.
+on:
+  push:
+    tags: ['freemagpie-v*']
+
+concurrency:
+  group: freemagpie-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Vet and full terminal test suite in isolated HOME
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GOPATH="$(go env GOPATH)" GOMODCACHE="$(go env GOMODCACHE)" GOCACHE="$(go env GOCACHE)"
+          test_home=$(mktemp -d)
+          env HOME="$test_home" go vet -tags nogui ./...
+          env HOME="$test_home" GOOS=windows CGO_ENABLED=0 go vet ./...
+          env HOME="$test_home" go test -timeout 30m -tags nogui ./...
+
+  build:
+    name: Build ${{ matrix.os }} ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            os: macos
+            arch: arm64
+          - runner: macos-15-intel
+            os: macos
+            arch: amd64
+          - runner: ubuntu-24.04
+            os: linux
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            os: linux
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Install Linux desktop dependencies
+        if: matrix.os == 'linux'
+        timeout-minutes: 15
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+      - name: Build, package and smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#freemagpie-v}"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          test "$(go env GOARCH)" = '${{ matrix.arch }}'
+          bash build/freemagpie/package.sh "$version" '${{ matrix.os }}'
+          if [ '${{ matrix.os }}/${{ matrix.arch }}' = linux/amd64 ]; then
+            bash build/freemagpie/package.sh "$version" windows
+          fi
+          cli="dist/magpie-cli-$(go env GOOS)-$(go env GOARCH)"
+          smoke_home=$(mktemp -d)
+          env HOME="$smoke_home" "$cli" --version | grep -F "$version"
+          env HOME="$smoke_home" "$cli" --help
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  windows-smoke:
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-linux-amd64
+          path: dist
+      - name: Execute Windows x64 binaries
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME.Replace('freemagpie-v', '')
+          $env:USERPROFILE = Join-Path $env:RUNNER_TEMP 'freemagpie-smoke'
+          New-Item -ItemType Directory -Force $env:USERPROFILE | Out-Null
+          foreach ($name in @('magpie-windows-amd64.exe', 'magpie-cli-windows-amd64.exe')) {
+            $output = & ".\dist\$name" --version | Out-String
+            if ($LASTEXITCODE -ne 0 -or -not $output.Contains($version)) { throw "$name smoke test failed: $output" }
+            Write-Output "$name : $output"
+          }
+          & .\dist\magpie-cli-windows-amd64.exe --help
+          if ($LASTEXITCODE -ne 0) { throw 'Windows CLI help failed' }
+
+  publish:
+    needs: [test, build, windows-smoke]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+      - name: Validate complete release and generate checksums
+        run: python3 build/freemagpie/manifest.py "${GITHUB_REF_NAME#freemagpie-v}" dist
+      - name: Publish complete release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --draft \
+            --title "FreeMagpie ${GITHUB_REF_NAME#freemagpie-v}" \
+            --notes-file build/freemagpie/RELEASE_NOTES.md
+          gh release edit "$GITHUB_REF_NAME" --draft=false --latest
