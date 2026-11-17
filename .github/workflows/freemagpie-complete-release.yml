@@ -1,0 +1,95 @@
+name: Complete FreeMagpie Release
+
+# freemagpie: recover a release when the hosted macOS ARM runner has no capacity.
+# The two Mac ARM files must already be built from the tag, tested natively,
+# ad-hoc signed and uploaded to a DRAFT release by the maintainer.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Existing version tag, without freemagpie-v'
+        required: true
+        type: string
+      run_id:
+        description: 'Original release run with green full tests and three completed platform builds'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  windows-smoke:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run_id }}
+          name: release-linux-amd64
+          path: dist
+      - name: Execute Windows x64 binaries
+        shell: pwsh
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          $env:USERPROFILE = Join-Path $env:RUNNER_TEMP 'freemagpie-smoke'
+          New-Item -ItemType Directory -Force $env:USERPROFILE | Out-Null
+          foreach ($name in @('magpie-windows-amd64.exe', 'magpie-cli-windows-amd64.exe')) {
+            $output = & ".\dist\$name" --version | Out-String
+            if ($LASTEXITCODE -ne 0 -or -not $output.Contains($env:VERSION)) { throw "$name smoke test failed: $output" }
+            Write-Output "$name : $output"
+          }
+          & .\dist\magpie-cli-windows-amd64.exe --help
+          if ($LASTEXITCODE -ne 0) { throw 'Windows CLI help failed' }
+
+  publish:
+    needs: windows-smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+      RUN_ID: ${{ inputs.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: freemagpie-v${{ inputs.version }}
+      - name: Verify tagged source, original tests and build results
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$RUN_ID" =~ ^[0-9]+$ ]]
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq .head_sha)" = "$(git rev-parse HEAD)"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/attempts/1/jobs" > /tmp/jobs.json
+          python3 - <<'PY'
+          import json
+          jobs = {j['name']: j['conclusion'] for j in json.load(open('/tmp/jobs.json'))['jobs']}
+          for name in ('test', 'Build macos amd64', 'Build linux amd64', 'Build linux arm64'):
+              assert jobs.get(name) == 'success', (name, jobs.get(name))
+          PY
+          test "$(gh release view "freemagpie-v$VERSION" --json isDraft --jq .isDraft)" = true
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run_id }}
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+      - name: Add tested native Mac ARM build and publish complete assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download "freemagpie-v$VERSION" --dir dist \
+            --pattern magpie-darwin-arm64.zip --pattern magpie-cli-darwin-arm64
+          python3 build/freemagpie/manifest.py "$VERSION" dist
+          (cd dist && sha256sum --check SHA256SUMS)
+          gh release upload "freemagpie-v$VERSION" dist/* --clobber
+          test "$(gh release view "freemagpie-v$VERSION" --json assets --jq '.assets | length')" = 18
+          gh release edit "freemagpie-v$VERSION" --draft=false --latest
