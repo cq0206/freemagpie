@@ -132,10 +132,10 @@ macOS 包只有 ad-hoc 签名，未经 Apple 公证；Windows 没有发布者签
 
 官网发布步骤（在 `freemagpie-site` 仓库）：
 
-1. 下载同一发行版的 `latest.json`、`notes.json`，按更新接口结构保存到
-   `api/latest`、`api/notes`；这些文件的无扩展名响应须为 JSON。
-2. 更新下载按钮和版本信息，校验所有链接对应真实非空资产。
-3. `wrangler deploy`，在线验证 HTTPS、更新接口、文件下载及 SHA-256。
+1. 下载按钮使用 GitHub Releases 的 Latest 安装包链接；Worker 的
+   `/api/latest`、`/api/notes` 从同一 Latest 版本读取已校验的 JSON 元数据。
+2. `wrangler deploy`，在线验证 HTTPS、更新接口、文件下载及 SHA-256。
+3. 之后发布新版本会自动更新下载和更新源；元数据最多缓存 5 分钟。
 
 
 ## 构建
