@@ -357,6 +357,10 @@ func run(args []string) error {
 		fmt.Println(strings.TrimRight(helpFor(args), "\n"))
 		return nil
 	}
+	// freemagpie: import before startup can create the destination directory.
+	if len(args) == 2 && args[0] == "data" && args[1] == "import-magpie" {
+		return appdir.ImportLegacyConfig()
+	}
 	if len(args) > 0 && args[0] == "healthcheck" {
 		return healthcheck(args[1:]) // every few seconds in a container: nothing else
 	}

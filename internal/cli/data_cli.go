@@ -82,7 +82,8 @@ func dataCmd(args []string) error {
 	return fmt.Errorf("unknown data command %q\n%s", args[0], dataUsage)
 }
 
-const dataUsage = `magpie data                     where magpie keeps its files and its cache
+const dataUsage = `magpie data import-magpie       copy old magpie configuration into a new FreeMagpie profile (destination must not exist)
+magpie data                     where magpie keeps its files and its cache
 magpie data move <folder>       move them into <folder>/magpie (another disk), leaving a link where they were
 magpie data move --home         move them back
 magpie data cancel              forget a move asked for while magpie was running

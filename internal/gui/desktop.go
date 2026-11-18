@@ -1,5 +1,7 @@
 package gui
 
+import "github.com/yetone/magpie/internal/appdir"
+
 // programName is the name magpie gives GTK on Linux (g_set_prgname, through
 // Wails' LinuxOptions.ProgramName). GTK3 makes it the window's Wayland
 // app_id and its X11 WM_CLASS ("magpie", "Magpie"); without it both are the
@@ -7,4 +9,4 @@ package gui
 // downloaded, which no desktop entry names, so the dock drew a gear (#2626).
 // The entry registerScheme writes names it in StartupWMClass. WebKitGTK keys
 // its data folder by it too (~/.local/share/magpie), see keepWebData.
-const programName = "magpie"
+var programName = appdir.Name

@@ -27,7 +27,7 @@ import (
 )
 
 // Name is the service's name: magpie.service, com.yetone.magpie.serve.
-const Name = "magpie"
+var Name = appdir.Name
 
 // Status is what the system says of the service.
 type Status struct {

@@ -1,0 +1,40 @@
+name: Verify FreeMagpie changes
+on:
+  workflow_dispatch:
+  push:
+    branches: [freemagpie]
+    paths:
+      - 'internal/**'
+      - 'Makefile'
+      - 'build/freemagpie/**'
+      - '.github/workflows/freemagpie-check.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Verify metadata, all terminal tests and cross-platform builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 build/freemagpie/test_manifest.py
+          bash -n build/freemagpie/package.sh build/freemagpie/notarize.sh
+          export GOPATH="$(go env GOPATH)" GOMODCACHE="$(go env GOMODCACHE)" GOCACHE="$(go env GOCACHE)"
+          test_home=$(mktemp -d)
+          export HOME="$test_home" TZ=UTC
+          go vet -tags nogui ./...
+          GOOS=windows CGO_ENABLED=0 go vet ./...
+          go test -timeout 30m -tags nogui ./...
+          make cli VERSION=verification
+          ./magpie data where | tee /tmp/paths.txt
+          grep -F '/freemagpie' /tmp/paths.txt
+          GOOS=windows CGO_ENABLED=0 go build -o /tmp/freemagpie.exe .

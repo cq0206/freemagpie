@@ -49,5 +49,5 @@ func webData() []string {
 	if appdir.Portable() != "" {
 		return nil
 	}
-	return []string{filepath.Join(dataHome(), "magpie")}
+	return []string{filepath.Join(dataHome(), appdir.Name)}
 }

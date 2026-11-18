@@ -18,11 +18,11 @@ func installPath() string {
 	local := appdir.Getenv("LOCALAPPDATA")
 	if local == "" {
 		if p, err := windows.KnownFolderPath(windows.FOLDERID_UserProgramFiles, 0); err == nil && p != "" {
-			return filepath.Join(p, "magpie", "magpie.exe")
+			return filepath.Join(p, appdir.Name, "magpie.exe")
 		}
 		return ""
 	}
-	return filepath.Join(local, "Programs", "magpie", "magpie.exe")
+	return filepath.Join(local, "Programs", appdir.Name, "magpie.exe")
 }
 
 // isDownloadFolder: Downloads and Desktop, where they are kept (the
@@ -75,6 +75,9 @@ func exeVersion(path string) uint64 {
 // webViewDefault is where WebView2 keeps the profile of the program at
 // exe when magpie names none: %APPDATA%\<exe name> (Wails' default).
 func webViewDefault(exe string) string {
+	if appdir.Name == "freemagpie" {
+		return filepath.Join(appdir.Config(), "webview2")
+	}
 	a := os.Getenv("AppData")
 	if a == "" {
 		return ""
@@ -95,7 +98,7 @@ func hide(p string) {
 
 // installKey holds InstallLocation, the folder the user chose to install
 // magpie in (Settle). Uninstall removes it.
-const installKey = `Software\magpie`
+var installKey = `Software\` + appdir.Name
 
 func readInstallDir() string {
 	k, err := registry.OpenKey(registry.CURRENT_USER, installKey, registry.QUERY_VALUE)

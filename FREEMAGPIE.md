@@ -55,6 +55,7 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 | 5 | 云端客户端 | internal/freemagpie/ | 纯客户端包（catalog/state/cache，不 import internal/gateway），测试齐 | 已做 |
 | 6 | Free First 模板 | internal/provider/grouptemplate.go（TemplateFree 分支 + NeedFree）+ grouptemplate_test.go, internal/gui/assets/plugins/routing/client.js, internal/gui/assets/i18n.js, internal/gui/tests/group-template.test.cjs | 一个分组模板（routing=expiring，成员为免费模型：CountFree / Entry.Free / FreeModel），复用 routes.FreeExpiring | 已做 |
 | 8 | 独立发布 | .github/workflows/freemagpie-release.yml + freemagpie-complete-release.yml, freemagpie-brand-downloads.yml, build/freemagpie/, internal/update/update.go + notes.go + freemagpie_test.go | 独立构建 13 个品牌安装包及旧名兼容附件、校验和、更新元数据；通过链接器覆盖更新源与发行页，保留上游其他服务地址 | 已做 |
+| 9 | 独立数据目录 | Makefile、internal/appdir/freemagpie*、appdir.go、internal/cli、settings/migrate.go、daemon、autostart、GUI GTK 名称、Windows 安装记录、Linux 卸载路径、发布打包脚本 | 配置/缓存/日志/系统数据目录独立化与显式旧配置导入，详见 distribution-storage | 已实现，验证中 |
 | 7 | 架构文档 | docs/freemagpie/ | FreeMagpie 架构方案（本分支的产品方向文档） | 已做 |
 
 > 第 4-6 项的设计依据见 docs/freemagpie/ARCHITECTURE.md。merge 冲突时：
@@ -70,10 +71,10 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 
 ## 品牌改动的边界（重要）
 
-改名时**只改面向用户的文案**，以下内容必须保持 `magpie` 不动，否则
+改名时**只改面向用户的文案**，除下述已明确变更的配置目录外，以下协议标识保持 `magpie` 不动，否则
 会破坏用户数据兼容性和协议标识：
 
-- 配置目录 `~/.config/magpie/`、`providers.json`、`affinity.json` 等文件名
+- 配置目录已按用户要求改为 `~/.config/freemagpie/`；`providers.json`、`affinity.json` 等数据文件格式和名称保留
 - HTTP 标识：`GET /` 返回的 `{"name":"magpie"}`、`magpie-<agent>` token、
   `magpie://` 链接、`X-Magpie-Session` 头、`MAGPIE_*` 环境变量
 - `claude-magpie` 启动器、codex 配置里的 `[model_providers.magpie]`
@@ -135,7 +136,7 @@ GitHub macOS ARM64 runner 无容量时，可使用恢复工作流
 
 macOS 包只有 ad-hoc 签名，未经 Apple 公证；Windows 没有发布者签名。
 不得宣传为已公证、免安全提示。官网与发行说明写明安装步骤。
-官网下载文件使用 `freemagpie-*`，macOS 包内为 `FreeMagpie.app`，CFBundleName 与显示名均为 FreeMagpie。保留 `magpie-*` 兼容附件供已安装版本更新；内部二进制名、配置目录与协议保持兼容。2026-11-18 对 0.1.0 补发品牌包装，程序代码未变。
+官网下载文件使用 `freemagpie-*`，macOS 包内为 `FreeMagpie.app`，CFBundleName 与显示名均为 FreeMagpie。保留 `magpie-*` 兼容附件供已安装版本更新；内部二进制名与协议保持兼容；配置、缓存、日志和系统应用数据使用独立 freemagpie 命名空间。2026-11-18 对 0.1.0 补发品牌包装，程序代码未变。
 
 官网发布步骤（在 `freemagpie-site` 仓库）：
 
@@ -162,3 +163,10 @@ go test ./...     # 测试（跑全量很慢，按包跑）
 注意：Makefile 有自我保护，必须在仓库根目录运行（`make -C <repo>` 可以）。
 
 已发布版本的品牌包装修复可运行 `Complete FreeMagpie download branding`。工作流先验证旧校验和，在原生 Mac runner 重新包装并签名验证两个 FreeMagpie Mac ZIP，直接复制其余平台相同程序为品牌名称，补齐清单与校验和。不会重编译或替换旧名程序。
+
+
+## 独立数据目录与 Apple 公证
+
+2026-11-18 按用户要求隔离全部应用数据目录，新增 `appdir.Name` 分发构建参数、独立 OS 缓存/日志/WebView/GTK 数据和安装记录。旧数据仅通过显式导入复制，不覆盖已有 FreeMagpie 数据。详细路径、迁移、失败行为与验证见 [distribution-storage](docs/subsystems/distribution-storage.md)。这项用户要求取代原有“共享上游配置目录”的边界。
+
+公证脚本已提供，但当前机器没有 Developer ID Application 证书，尚未向 Apple 提交公证。开发者会员与证书就绪后，在 Keychain 配置 notarytool profile，设置 `FREEMAGPIE_SIGNING_IDENTITY` 和 `FREEMAGPIE_NOTARY_PROFILE` 再运行发布打包脚本。只有签名、公证 Accepted、staple 和 Gatekeeper 验证均成功，才能更新官网为“已公证”。凭据不进入仓库。

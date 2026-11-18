@@ -4,6 +4,7 @@ These pages describe current responsibilities, runtime paths, state, and contrac
 
 | Subsystem | Reference |
 | --- | --- |
+| FreeMagpie data directories, migration and macOS signing | [Distribution storage](distribution-storage.md) |
 | Built-in subscriptions moving to plugins | [Provider and plugin ownership](provider-plugins.md) |
 | Built-in plugins: registry, lifecycle, plugins.yml, presets, settings schemas, the window's kernel (slots, error boundary, kit) | [Plugin runtime](plugin-runtime.md) |
 | Plugins that run on the gateway's requests and replies | [Gateway middleware](gateway-middleware.md) |

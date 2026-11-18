@@ -21,7 +21,7 @@ func record() string {
 		home, _ := os.UserHomeDir()
 		dir = filepath.Join(home, ".config")
 	}
-	return filepath.Join(dir, "autostart", "magpie.desktop")
+	return filepath.Join(dir, "autostart", appdir.Name+".desktop")
 }
 
 // systemRecords are the system's entries of the same name, one in each
@@ -47,7 +47,7 @@ func systemRecords() []string {
 		if fi, err := os.Stat(dir); err == nil && ownErr == nil && os.SameFile(fi, own) {
 			continue
 		}
-		out = append(out, filepath.Join(dir, "magpie.desktop"))
+		out = append(out, filepath.Join(dir, appdir.Name+".desktop"))
 	}
 	return out
 }

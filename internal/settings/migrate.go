@@ -19,12 +19,8 @@ func Migrate() {
 		return
 	}
 	copyTree(filepath.Join(filepath.Dir(Dir()), "dial"), Dir())
-	cache := appdir.Getenv("XDG_CACHE_HOME")
-	if cache == "" {
-		home, _ := os.UserHomeDir()
-		cache = filepath.Join(home, ".cache")
-	}
-	copyTree(filepath.Join(cache, "dial"), filepath.Join(cache, "magpie"))
+	cache := filepath.Dir(appdir.Cache())
+	copyTree(filepath.Join(cache, "dial"), appdir.Cache())
 }
 
 // copyTree copies src into dst, files and modes alike, when src exists and

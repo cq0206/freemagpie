@@ -1,6 +1,7 @@
 package autostart
 
 import (
+	"github.com/yetone/magpie/internal/appdir"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,7 +12,7 @@ import (
 // Termux:Boot runs executable scripts in ~/.termux/boot after Android boots.
 func record() string {
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".termux", "boot", "magpie")
+	return filepath.Join(home, ".termux", "boot", appdir.Name)
 }
 
 func enabled() bool {

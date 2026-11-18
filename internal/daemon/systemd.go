@@ -14,7 +14,7 @@ import (
 // systemd runs the service as a user unit: systemctl --user, no root.
 type systemd struct{}
 
-const unit = Name + ".service"
+var unit = Name + ".service"
 
 func (systemd) file() string {
 	dir := os.Getenv("XDG_CONFIG_HOME")
