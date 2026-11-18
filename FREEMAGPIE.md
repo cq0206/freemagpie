@@ -54,7 +54,7 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 | 4 | 免费积分市场 | plugins/credits/, internal/gui/credits.go, internal/gui/credits_test.go, internal/gui/assets/plugins/credits/, internal/gui/tests/credits-page.test.cjs, internal/gui/api.go（+1 行路由）, plugins/all/all.go（+1 行 import）, internal/gui/assets/index.html, internal/gui/assets/i18n.js, internal/gui/builtins_test.go（内置插件数 + credits 必备）, internal/gui/tests/builtins.test.cjs, internal/settings/settings.go + internal/settingsapi/settingsapi.go（FreeMagpieURL/FreeMagpieQuota 字段）, internal/cli/settings_parity_test.go, internal/gui/settings_keep_test.go | Free Credits Market 内置插件 + 云端目录客户端 | 已做 |
 | 5 | 云端客户端 | internal/freemagpie/ | 纯客户端包（catalog/state/cache，不 import internal/gateway），测试齐 | 已做 |
 | 6 | Free First 模板 | internal/provider/grouptemplate.go（TemplateFree 分支 + NeedFree）+ grouptemplate_test.go, internal/gui/assets/plugins/routing/client.js, internal/gui/assets/i18n.js, internal/gui/tests/group-template.test.cjs | 一个分组模板（routing=expiring，成员为免费模型：CountFree / Entry.Free / FreeModel），复用 routes.FreeExpiring | 已做 |
-| 8 | 独立发布 | .github/workflows/freemagpie-release.yml + freemagpie-complete-release.yml, build/freemagpie/, internal/update/update.go + notes.go + freemagpie_test.go | 独立构建 13 个品牌安装包及旧名兼容附件、校验和、更新元数据；通过链接器覆盖更新源与发行页，保留上游其他服务地址 | 已做 |
+| 8 | 独立发布 | .github/workflows/freemagpie-release.yml + freemagpie-complete-release.yml, freemagpie-brand-downloads.yml, build/freemagpie/, internal/update/update.go + notes.go + freemagpie_test.go | 独立构建 13 个品牌安装包及旧名兼容附件、校验和、更新元数据；通过链接器覆盖更新源与发行页，保留上游其他服务地址 | 已做 |
 | 7 | 架构文档 | docs/freemagpie/ | FreeMagpie 架构方案（本分支的产品方向文档） | 已做 |
 
 > 第 4-6 项的设计依据见 docs/freemagpie/ARCHITECTURE.md。merge 冲突时：
@@ -160,3 +160,5 @@ go test ./...     # 测试（跑全量很慢，按包跑）
 ```
 
 注意：Makefile 有自我保护，必须在仓库根目录运行（`make -C <repo>` 可以）。
+
+已发布版本的品牌包装修复可运行 `Complete FreeMagpie download branding`。先原生验证并上传两个 FreeMagpie Mac ZIP；工作流验证旧校验和，直接复制其余平台相同程序为品牌名称，补齐清单与校验和。不会重编译或替换旧名程序。
