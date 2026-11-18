@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   branding:
-    runs-on: ubuntu-24.04
+    runs-on: macos-15-intel
     timeout-minutes: 20
     env:
       GH_TOKEN: ${{ github.token }}
@@ -33,14 +33,15 @@ jobs:
           tag="freemagpie-v$VERSION"
           test "$(gh release view "$tag" --json isDraft --jq .isDraft)" = false
           gh release download "$tag" --dir dist
-          (cd dist && sha256sum --check SHA256SUMS)
+          (cd dist && shasum -a 256 --check SHA256SUMS)
+          python3 build/freemagpie/brand_macos.py dist
           for asset in dist/magpie-*; do
             [[ "$asset" == *.zip ]] && continue
             cp "$asset" "dist/free${asset#dist/}"
           done
           python3 build/freemagpie/test_manifest.py
           python3 build/freemagpie/manifest.py "$VERSION" dist
-          (cd dist && sha256sum --check SHA256SUMS)
+          (cd dist && shasum -a 256 --check SHA256SUMS)
           gh release upload "$tag" dist/freemagpie-* --clobber
           gh release upload "$tag" dist/latest.json dist/notes.json dist/SHA256SUMS --clobber
           gh release edit "$tag" --notes-file build/freemagpie/RELEASE_NOTES.md
