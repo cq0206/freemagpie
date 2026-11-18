@@ -55,7 +55,7 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 | 5 | 云端客户端 | internal/freemagpie/ | 纯客户端包（catalog/state/cache，不 import internal/gateway），测试齐 | 已做 |
 | 6 | Free First 模板 | internal/provider/grouptemplate.go（TemplateFree 分支 + NeedFree）+ grouptemplate_test.go, internal/gui/assets/plugins/routing/client.js, internal/gui/assets/i18n.js, internal/gui/tests/group-template.test.cjs | 一个分组模板（routing=expiring，成员为免费模型：CountFree / Entry.Free / FreeModel），复用 routes.FreeExpiring | 已做 |
 | 8 | 独立发布 | .github/workflows/freemagpie-release.yml + freemagpie-complete-release.yml, freemagpie-brand-downloads.yml, build/freemagpie/, internal/update/update.go + notes.go + freemagpie_test.go | 独立构建 13 个品牌安装包及旧名兼容附件、校验和、更新元数据；通过链接器覆盖更新源与发行页，保留上游其他服务地址 | 已做 |
-| 9 | 独立数据目录 | Makefile、internal/appdir/freemagpie*、appdir.go、internal/cli、settings/migrate.go、daemon、autostart、GUI GTK 名称、Windows 安装记录、Linux 卸载路径、发布打包脚本 | 配置/缓存/日志/系统数据目录独立化与显式旧配置导入，详见 distribution-storage | 已实现，验证中 |
+| 9 | 独立数据目录 | Makefile、internal/appdir/freemagpie*、appdir.go、internal/cli、settings/migrate.go、daemon、autostart、GUI GTK 名称、Windows 安装记录、Linux 卸载路径、发布打包脚本 | 配置/缓存/日志/系统数据目录独立化与显式旧配置导入，详见 distribution-storage | 已做（云端完整 nogui 测试与跨平台构建通过） |
 | 7 | 架构文档 | docs/freemagpie/ | FreeMagpie 架构方案（本分支的产品方向文档） | 已做 |
 
 > 第 4-6 项的设计依据见 docs/freemagpie/ARCHITECTURE.md。merge 冲突时：
