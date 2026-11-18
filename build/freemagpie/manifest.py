@@ -22,6 +22,7 @@ names += [
     )
     for arch in arches
 ]
+names += ["free" + name for name in names]
 names += ["LICENSE", "THIRD_PARTY_NOTICES"]
 url = f"https://github.com/cq0206/freemagpie/releases/tag/freemagpie-v{version}"
 download = url.replace("/tag/", "/download/")

@@ -13,11 +13,15 @@ case "$target" in
     make app VERSION="$version" LDFLAGS="$ldflags"
     # Preserve magpie's executable, bundle identifier and configuration paths.
     /usr/libexec/PlistBuddy -c 'Set :CFBundleDisplayName FreeMagpie' magpie.app/Contents/Info.plist
+    /usr/libexec/PlistBuddy -c 'Set :CFBundleName FreeMagpie' magpie.app/Contents/Info.plist
     cp LICENSE magpie.app/Contents/Resources/LICENSE
     codesign --force --deep --sign - magpie.app
     codesign --verify --deep --strict magpie.app
     env HOME="$smoke_home" ./magpie.app/Contents/MacOS/magpie --version
     ditto -c -k --sequesterRsrc --keepParent magpie.app "dist/magpie-darwin-$arch.zip"
+    branded=$(mktemp -d)
+    ditto magpie.app "$branded/FreeMagpie.app"
+    ditto -c -k --sequesterRsrc --keepParent "$branded/FreeMagpie.app" "dist/freemagpie-darwin-$arch.zip"
     make release-cli VERSION="$version" LDFLAGS="$ldflags" TARGETS="darwin/$arch"
     ;;
   linux)
@@ -33,3 +37,9 @@ case "$target" in
   *) echo "unknown target: $target" >&2; exit 1 ;;
 esac
 cp LICENSE THIRD_PARTY_NOTICES dist/
+# User-facing downloads use the distribution name. Legacy assets remain for
+# installed versions whose updater expects magpie-* and magpie.app.
+for asset in dist/magpie-*; do
+  [[ "$asset" == *.zip ]] && continue
+  cp "$asset" "dist/free${asset#dist/}"
+done

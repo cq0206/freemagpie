@@ -54,7 +54,7 @@ git diff main...freemagpie --stat   # 查看我们相对上游的全部改动
 | 4 | 免费积分市场 | plugins/credits/, internal/gui/credits.go, internal/gui/credits_test.go, internal/gui/assets/plugins/credits/, internal/gui/tests/credits-page.test.cjs, internal/gui/api.go（+1 行路由）, plugins/all/all.go（+1 行 import）, internal/gui/assets/index.html, internal/gui/assets/i18n.js, internal/gui/builtins_test.go（内置插件数 + credits 必备）, internal/gui/tests/builtins.test.cjs, internal/settings/settings.go + internal/settingsapi/settingsapi.go（FreeMagpieURL/FreeMagpieQuota 字段）, internal/cli/settings_parity_test.go, internal/gui/settings_keep_test.go | Free Credits Market 内置插件 + 云端目录客户端 | 已做 |
 | 5 | 云端客户端 | internal/freemagpie/ | 纯客户端包（catalog/state/cache，不 import internal/gateway），测试齐 | 已做 |
 | 6 | Free First 模板 | internal/provider/grouptemplate.go（TemplateFree 分支 + NeedFree）+ grouptemplate_test.go, internal/gui/assets/plugins/routing/client.js, internal/gui/assets/i18n.js, internal/gui/tests/group-template.test.cjs | 一个分组模板（routing=expiring，成员为免费模型：CountFree / Entry.Free / FreeModel），复用 routes.FreeExpiring | 已做 |
-| 8 | 独立发布 | .github/workflows/freemagpie-release.yml + freemagpie-complete-release.yml, build/freemagpie/, internal/update/update.go + notes.go + freemagpie_test.go | 独立构建 13 个安装包、校验和、更新元数据；通过链接器覆盖更新源与发行页，保留上游其他服务地址 | 已做 |
+| 8 | 独立发布 | .github/workflows/freemagpie-release.yml + freemagpie-complete-release.yml, build/freemagpie/, internal/update/update.go + notes.go + freemagpie_test.go | 独立构建 13 个品牌安装包及旧名兼容附件、校验和、更新元数据；通过链接器覆盖更新源与发行页，保留上游其他服务地址 | 已做 |
 | 7 | 架构文档 | docs/freemagpie/ | FreeMagpie 架构方案（本分支的产品方向文档） | 已做 |
 
 > 第 4-6 项的设计依据见 docs/freemagpie/ARCHITECTURE.md。merge 冲突时：
@@ -116,7 +116,7 @@ FreeMagpie 的发行分支是 `freemagpie`，使用 **`freemagpie-vX.Y.Z`** 标�
 # 在 freemagpie 分支提交并推送发布配置后：
 git tag freemagpie-v0.1.0
 git push origin freemagpie-v0.1.0
-# 等 FreeMagpie Release 全部通过，确认 Releases 包含 13 个程序文件、
+# 等 FreeMagpie Release 全部通过，确认 Releases 包含 13 个 FreeMagpie 程序文件、13 个旧名兼容程序文件、
 # LICENSE、THIRD_PARTY_NOTICES、latest.json、notes.json、SHA256SUMS。
 ```
 
@@ -128,14 +128,14 @@ Windows ARM64 与 Android 包只交叉编译，尚未做原生设备启动检查
 
 GitHub macOS ARM64 runner 无容量时，可使用恢复工作流
 `Complete FreeMagpie Release`：从同一标签在本机 Mac ARM64 原生构建并 smoke
-检查，将两个 Mac ARM64 文件上传到 Draft Release；输入原 Release run ID 与
+检查，将四个 Mac ARM64 文件上传到 Draft Release；输入原 Release run ID 与
 版本。恢复流程校验原 run 的提交等于标签、全量测试及另外三个平台构建均成功，
-重新在 Windows 原生执行 x64 程序，并检查 13 个程序、许可、元数据及 SHA-256
+重新在 Windows 原生执行 x64 程序，并检查 26 个程序附件、许可、元数据及 SHA-256
 齐全后才公开 Release。先取消原 run，避免两个发布者竞争。
 
 macOS 包只有 ad-hoc 签名，未经 Apple 公证；Windows 没有发布者签名。
 不得宣传为已公证、免安全提示。官网与发行说明写明安装步骤。
-保持 `magpie.app`、二进制名、配置目录与协议兼容；完整品牌替换另做。
+官网下载文件使用 `freemagpie-*`，macOS 包内为 `FreeMagpie.app`，CFBundleName 与显示名均为 FreeMagpie。保留 `magpie-*` 兼容附件供已安装版本更新；内部二进制名、配置目录与协议保持兼容。2026-11-18 对 0.1.0 补发品牌包装，程序代码未变。
 
 官网发布步骤（在 `freemagpie-site` 仓库）：
 

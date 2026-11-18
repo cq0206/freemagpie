@@ -87,9 +87,10 @@ jobs:
         run: |
           set -euo pipefail
           gh release download "freemagpie-v$VERSION" --dir dist \
-            --pattern magpie-darwin-arm64.zip --pattern magpie-cli-darwin-arm64
+            --pattern magpie-darwin-arm64.zip --pattern magpie-cli-darwin-arm64 \
+            --pattern freemagpie-darwin-arm64.zip --pattern freemagpie-cli-darwin-arm64
           python3 build/freemagpie/manifest.py "$VERSION" dist
           (cd dist && sha256sum --check SHA256SUMS)
           gh release upload "freemagpie-v$VERSION" dist/* --clobber
-          test "$(gh release view "freemagpie-v$VERSION" --json assets --jq '.assets | length')" = 18
+          test "$(gh release view "freemagpie-v$VERSION" --json assets --jq '.assets | length')" = 31
           gh release edit "freemagpie-v$VERSION" --draft=false --latest
