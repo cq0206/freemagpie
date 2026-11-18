@@ -161,4 +161,4 @@ go test ./...     # 测试（跑全量很慢，按包跑）
 
 注意：Makefile 有自我保护，必须在仓库根目录运行（`make -C <repo>` 可以）。
 
-已发布版本的品牌包装修复可运行 `Complete FreeMagpie download branding`。先原生验证并上传两个 FreeMagpie Mac ZIP；工作流验证旧校验和，直接复制其余平台相同程序为品牌名称，补齐清单与校验和。不会重编译或替换旧名程序。
+已发布版本的品牌包装修复可运行 `Complete FreeMagpie download branding`。工作流先验证旧校验和，在原生 Mac runner 重新包装并签名验证两个 FreeMagpie Mac ZIP，直接复制其余平台相同程序为品牌名称，补齐清单与校验和。不会重编译或替换旧名程序。
