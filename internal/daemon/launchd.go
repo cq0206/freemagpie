@@ -26,7 +26,7 @@ func (launchd) file() string {
 	return filepath.Join(home(), "Library", "LaunchAgents", Label+".plist")
 }
 
-func logFile() string { return filepath.Join(appdir.Logs(), "serve.log") }
+func logFile() string { return filepath.Join(home(), "Library", "Logs", appdir.Name, "serve.log") }
 
 func (launchd) logs() string { return "tail -f " + strconv.Quote(logFile()) }
 
