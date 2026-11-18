@@ -47,7 +47,7 @@ import (
 
 // MoveName is the folder made in the one the user picks: config and cache
 // go into it.
-const MoveName = "magpie"
+var MoveName = Name
 
 const (
 	moveAsked  = "move-to.json"     // in Config: a move made at the next start

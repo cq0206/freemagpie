@@ -99,7 +99,7 @@ func InstallDir(picked string) string {
 	if strings.EqualFold(filepath.Base(picked), "magpie") {
 		return picked
 	}
-	return filepath.Join(picked, "magpie")
+	return filepath.Join(picked, appdir.Name)
 }
 
 // Installable says why dir can't be installed in, nil when it can: a
